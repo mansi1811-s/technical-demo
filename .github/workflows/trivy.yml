@@ -44,15 +44,24 @@ jobs:
     - name: Check vulnerability
       run: |
         trivy_output=$(trivy image --severity HIGH --no-progress new:v1)
-           python - <<EOF
-           import sys
+        python - <<EOF
+        import sys
 
-            if 'Total: 0' in "$trivy_output":
-                print('No vulnerability found')
-            else:
-                print('Vulnerability found')
+        if 'Total: 0' in "$trivy_output":
+            print('No vulnerability found')
+        else:
+            print('Vulnerability found')
             sys.exit(1)  # Terminate the workflow
-            EOF
+        EOF
+           # python - <<EOF
+           # import sys
+
+           #  if 'Total: 0' in "$trivy_output":
+           #      print('No vulnerability found')
+           #  else:
+           #      print('Vulnerability found')
+           #  sys.exit(1)  # Terminate the workflow
+           #  EOF
         # if echo "$trivy_output" | grep -q 'Total: 0'; then
         #   echo 'No vulnerability found'
         # else
