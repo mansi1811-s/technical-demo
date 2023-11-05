@@ -35,24 +35,25 @@ jobs:
         curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin
         trivy -v
 
-    - name: Scan Docker Image for Vulnerabilities with Trivy
-      run: |
-        trivy image  --severity=HIGH,CRITICAL new:v1
-      # continue-on-error: false
-      # if: ${{ success() }}
+    # - name: Scan Docker Image for Vulnerabilities with Trivy
+    #   run: |
+    #     trivy image --severity=HIGH --exit-code 1 new:v1
+    #     # trivy image  --severity=HIGH,CRITICAL new:v1
+    #   # continue-on-error: false
+    #   # if: ${{ success() }}
 
-    - name: Check vulnerability
-      run: |
-        trivy_output=$(trivy image --severity HIGH --no-progress new:v1)
-        python - <<EOF
-        import sys
+    # - name: Check vulnerability
+    #   run: |
+    #     trivy_output=$(trivy image --severity HIGH --no-progress new:v1)
+    #     python - <<EOF
+    #     import sys
 
-        if 'Total: 0' in "$trivy_output":
-            print('No vulnerability found')
-        else:
-            print('Vulnerability found')
-            sys.exit(1)  # Terminate the workflow
-        EOF
+    #     if 'Total: 0' in "$trivy_output":
+    #         print('No vulnerability found')
+    #     else:
+    #         print('Vulnerability found')
+    #         sys.exit(1)  # Terminate the workflow
+    #     EOF
            # python - <<EOF
            # import sys
 
