@@ -44,12 +44,21 @@ jobs:
     - name: Check vulnerability
       run: |
         trivy_output=$(trivy image --severity HIGH --no-progress new:v1)
-        if echo "$trivy_output" | grep -q 'Total: 0'; then
-          echo 'No vulnerability found'
-        else
-          echo 'Vulnerability found'
-          exit 1
-        fi
+           python - <<EOF
+           import sys
+
+            if 'Total: 0' in "$trivy_output":
+                print('No vulnerability found')
+            else:
+                print('Vulnerability found')
+            sys.exit(1)  # Terminate the workflow
+            EOF
+        # if echo "$trivy_output" | grep -q 'Total: 0'; then
+        #   echo 'No vulnerability found'
+        # else
+        #   echo 'Vulnerability found'
+        #   exit 1
+        # fi
         
     - name: Push Docker Image
       run: |
