@@ -1,3 +1,4 @@
+# pylint: disable=E0401
 """ Python flask app for s3 Management """
 from flask import Flask, render_template, request
 import boto3
@@ -66,7 +67,7 @@ def create_folder():
     try:
         bucket_name = request.form['bucket_name']
         directory_name = request.form['directory_name']
-        client.put_object(Bucket=bucket_name, Key=(directory_name + '/'))
+        client.put_object(Bucket=bucket_name, Key=(directory_name + '/'))  # pylint: disable=superfluous-parens
         return render_template('status.html', message='Folder created successfully')
     except ClientError as error:
         message = error.response["Error"]['Code']
