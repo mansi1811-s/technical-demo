@@ -1,0 +1,49 @@
+name: Pre-Merge Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_run:
+    workflows: ["Pylint", "gitleaks", "codeql"]
+    types:
+      - completed
+
+jobs:
+  build:
+    name: pre-merge-check
+    runs-on: ubuntu-latest
+    strategy:
+  #    fail-fast: true
+      matrix:
+        language: ['python']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker Image
+      run: |
+        docker build -t new:v1 .
+        docker image tag new:v1 mansi1811/new:v1
+
+    - name: Set up Trivy
+      run: |
+        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin
+        trivy -v
+
+    - name: Scan Docker Image for Vulnerabilities with Trivy
+      run: |
+        trivy image --severity=HIGH,CRITICAL --exit-code 1 new:v1
+        
+    - name: Push Docker Image
+      run: |
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker push mansi1811/new:v1
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      shell: bash
